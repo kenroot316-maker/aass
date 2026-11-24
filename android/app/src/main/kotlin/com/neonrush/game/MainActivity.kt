@@ -106,5 +106,6 @@ class MainActivity : ComponentActivity() {
     override fun onDestroy() {
         super.onDestroy()
         appScope.cancel()
+        com.neonrush.game.MusicManager.release()
     }
 }

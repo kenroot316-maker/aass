@@ -41,6 +41,21 @@ class LocalStore(context: Context) {
         get() = prefs.getBoolean(KEY_HAPTICS, true)
         set(value) = prefs.edit().putBoolean(KEY_HAPTICS, value).apply()
 
+    /** Soundtrack on/off (separate from the sfx toggle). */
+    var musicOn: Boolean
+        get() = prefs.getBoolean(KEY_MUSIC, true)
+        set(value) = prefs.edit().putBoolean(KEY_MUSIC, value).apply()
+
+    /** Local avatar style preset (0-11) used when no photo was uploaded. */
+    var avatarStyle: Int
+        get() = prefs.getInt(KEY_AVATAR_STYLE, 0)
+        set(value) = prefs.edit().putInt(KEY_AVATAR_STYLE, value).apply()
+
+    /** Cached uploaded avatar data URI (photo). Null = use preset style. */
+    var avatarData: String?
+        get() = prefs.getString(KEY_AVATAR_DATA, null)
+        set(value) = prefs.edit().putString(KEY_AVATAR_DATA, value).apply()
+
     /**
      * Game server base url override. Empty string = use ApiConfig.DEFAULT_BASE_URL.
      * Editable in Settings so the APK can be pointed at any deployment.
@@ -94,6 +109,9 @@ class LocalStore(context: Context) {
         const val KEY_NICK = "nickname"
         const val KEY_SOUND = "sound_on"
         const val KEY_HAPTICS = "haptics_on"
+        const val KEY_MUSIC = "music_on"
+        const val KEY_AVATAR_STYLE = "avatar_style"
+        const val KEY_AVATAR_DATA = "avatar_data"
         const val KEY_SERVER = "server_url"
         const val KEY_BEST_CLASSIC = "best_classic"
         const val KEY_BEST_RUSH = "best_coinrush"
