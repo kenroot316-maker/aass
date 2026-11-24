@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Neon Rush API</title>
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { background:#0B0E1A; color:#fff; font-family: system-ui, -apple-system, sans-serif;
+         min-height:100vh; display:flex; align-items:center; justify-content:center; }
+  main { max-width:640px; padding:48px 24px; }
+  h1 { color:#22E0FF; letter-spacing:2px; font-size:34px; }
+  .sub { color:#FF2D95; margin-top:4px; font-size:14px; letter-spacing:1px; }
+  section { margin-top:28px; background:#131A2E; border:1px solid #22E0FF33; border-radius:14px; padding:18px; }
+  h2 { color:#FF2D95; font-size:16px; margin-bottom:10px; }
+  p { color:#B9C2D8; font-size:14px; line-height:1.6; }
+  code { color:#B6FF3C; background:#0B0E1A; padding:1px 6px; border-radius:5px; font-size:13px; }
+  .ok { color:#B6FF3C; font-weight:700; }
+  .bad { color:#FF2D95; font-weight:700; }
+  ul { margin:8px 0 0 18px; color:#B9C2D8; font-size:13px; line-height:1.9; }
+</style>
+</head>
+<body>
+<main>
+  <h1>NEON RUSH API</h1>
+  <div class="sub">Outrun the light — server backend</div>
+
+  <section>
+    <h2>Status</h2>
+    <p id="dbline">Database: <span id="dbstate" class="bad">checking…</span></p>
+    <p id="errdetail" style="color:#8892A6;font-size:12px;margin-top:8px;display:none"></p>
+  </section>
+
+  <section>
+    <h2>Endpoints</h2>
+    <ul>
+      <li><code>GET /api/health</code></li>
+      <li><code>POST /api/players</code></li>
+      <li><code>GET|PATCH /api/players/{id}</code></li>
+      <li><code>POST /api/scores</code></li>
+      <li><code>GET /api/leaderboard?mode=classic|coinrush|daily</code></li>
+    </ul>
+  </section>
+</main>
+<script>
+fetch('/api/health').then(r => r.json()).then(d => {
+  const el = document.getElementById('dbstate');
+  if (d.database === 'connected') { el.textContent = 'connected'; el.className = 'ok'; }
+  else {
+    el.textContent = 'not configured';
+    const hint = document.getElementById('errdetail');
+    hint.style.display = 'block';
+    hint.textContent = 'Set DATABASE_URL in Vercel (Neon connection string), then redeploy. ' + (d.detail || '');
+  }
+}).catch(() => {
+  document.getElementById('dbstate').textContent = 'unreachable';
+});
+</script>
+</body>
+</html>
