@@ -1,0 +1,21 @@
+# Node / Next.js
+node_modules/
+.next/
+out/
+.env
+.env*.local
+tsconfig.tsbuildinfo
+.vercel
+
+# Android build outputs
+android/local.properties
+android/.gradle/
+android/build/
+android/app/build/
+android/.idea/
+*.iml
+local.properties
+
+# OS junk
+.DS_Store
+Thumbs.db
