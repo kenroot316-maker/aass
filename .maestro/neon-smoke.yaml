@@ -1,0 +1,11 @@
+# Neon Rush smoke test - runs on the emulator (laptop E2E runner)
+appId: com.neonrush.game
+---
+- launchApp:
+    clearState: true
+- assertVisible: "NEON RUSH"
+- assertVisible: "Classic Run"
+- assertVisible: "Coin Rush"
+- assertVisible: "Daily Challenge"
+- tapOn: "Classic Run"
+- assertVisible: "TAP TO START"
