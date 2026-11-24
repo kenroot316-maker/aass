@@ -1,4 +1,4 @@
-import { db } from "../lib/db";
+import { db, ensureSchema } from "../lib/db";
 import { isGameMode, todayKeyUtc } from "../lib/game";
 
 /** GET /api/leaderboard?mode=classic|coinrush|daily[&key=YYYY-MM-DD][&limit=100] */
@@ -16,6 +16,7 @@ export default async function handler(req: any, res: any) {
     mode === "daily" ? (String(req.query.key ?? "").trim() || todayKeyUtc()) : null;
 
   try {
+    await ensureSchema();
     const rows = await db()`
       SELECT s.player_id, p.nickname, s.score, s.coins,
              ROW_NUMBER() OVER (ORDER BY s.score DESC)::int AS rank

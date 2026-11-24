@@ -1,4 +1,4 @@
-import { db } from "../../lib/db";
+import { db, ensureSchema } from "../../lib/db";
 import { isValidNickname } from "../../lib/game";
 
 /** GET /api/players/{id} — full profile: bests, world ranks, achievements. */
@@ -11,6 +11,7 @@ export default async function handler(req: any, res: any) {
 
   if (req.method === "GET") {
     try {
+      await ensureSchema();
       const playerRows = await db()`
         SELECT id, nickname, created_at FROM players WHERE id = ${id}`;
       if (playerRows.length === 0) {
@@ -77,6 +78,7 @@ export default async function handler(req: any, res: any) {
       res.status(400).json({ error: "Nickname must be 3-16 letters, digits, underscores or spaces" });
       return;
     }
+    await ensureSchema();
     try {
       const rows = await db()`
         UPDATE players SET nickname = ${nickname}

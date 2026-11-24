@@ -1,4 +1,4 @@
-import { db } from "../lib/db";
+import { db, ensureSchema } from "../lib/db";
 import { defaultNickname, isValidNickname } from "../lib/game";
 
 function parseBody(raw: any): any {
@@ -28,6 +28,7 @@ export default async function handler(req: any, res: any) {
       : defaultNickname();
 
   try {
+    await ensureSchema();
     const id = crypto.randomUUID();
     const rows = await db()`
       INSERT INTO players (id, device_id, nickname)

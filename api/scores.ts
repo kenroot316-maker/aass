@@ -1,4 +1,4 @@
-import { db } from "../lib/db";
+import { db, ensureSchema } from "../lib/db";
 import {
   COINS_CAP,
   SECONDS_CAP,
@@ -56,6 +56,7 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
+    await ensureSchema();
     const ownerRows = await db()`
       SELECT id FROM players WHERE id = ${playerId}`;
     if (ownerRows.length === 0) {
