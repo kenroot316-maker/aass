@@ -34,7 +34,7 @@ export default async function handler(req: any, res: any) {
       INSERT INTO players (id, device_id, nickname)
       VALUES (${id}, ${deviceId}, ${nickname})
       ON CONFLICT (device_id) DO UPDATE SET nickname = players.nickname
-      RETURNING id, nickname, created_at`;
+      RETURNING id, nickname, created_at, avatar`;
 
     const p = rows[0];
     res.status(200).json({
@@ -42,6 +42,7 @@ export default async function handler(req: any, res: any) {
         id: String(p.id),
         nickname: String(p.nickname),
         createdAt: p.created_at ? new Date(p.created_at as string).toISOString() : null,
+        avatar: p.avatar ? String(p.avatar) : null,
       },
     });
   } catch (e) {

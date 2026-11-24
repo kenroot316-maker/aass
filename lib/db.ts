@@ -66,6 +66,8 @@ export async function ensureSchema(): Promise<void> {
         unlocked_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
         PRIMARY KEY (player_id, achievement_id)
       )`;
+    // v2 migration: avatars (idempotent — safe on fresh and existing databases)
+    await sql`ALTER TABLE players ADD COLUMN IF NOT EXISTS avatar TEXT`;
     schemaReady = true;
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);

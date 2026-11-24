@@ -18,7 +18,7 @@ export default async function handler(req: any, res: any) {
   try {
     await ensureSchema();
     const rows = await db()`
-      SELECT s.player_id, p.nickname, s.score, s.coins,
+      SELECT s.player_id, p.nickname, p.avatar, s.score, s.coins,
              ROW_NUMBER() OVER (ORDER BY s.score DESC)::int AS rank
       FROM scores s JOIN players p ON p.id = s.player_id
       WHERE s.mode = ${mode}
@@ -35,6 +35,7 @@ export default async function handler(req: any, res: any) {
         nickname: String(r.nickname),
         score: Number(r.score),
         coins: Number(r.coins),
+        avatar: r.avatar ? String(r.avatar) : null,
       })),
     });
   } catch (e) {
