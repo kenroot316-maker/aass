@@ -5,6 +5,8 @@ CREATE TABLE IF NOT EXISTS players (
   id         TEXT PRIMARY KEY,
   device_id  TEXT UNIQUE NOT NULL,
   nickname   TEXT NOT NULL,
+  -- uploaded avatar as a data URI (data:image/...), null = none
+  avatar     TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 

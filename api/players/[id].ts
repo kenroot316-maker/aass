@@ -13,7 +13,7 @@ export default async function handler(req: any, res: any) {
     try {
       await ensureSchema();
       const playerRows = await db()`
-        SELECT id, nickname, created_at FROM players WHERE id = ${id}`;
+        SELECT id, nickname, avatar, created_at FROM players WHERE id = ${id}`;
       if (playerRows.length === 0) {
         res.status(404).json({ error: "Player not found" });
         return;
@@ -50,6 +50,7 @@ export default async function handler(req: any, res: any) {
           id: String(p.id),
           nickname: String(p.nickname),
           createdAt: p.created_at ? new Date(p.created_at as string).toISOString() : null,
+          avatar: p.avatar ? String(p.avatar) : null,
         },
         bestClassic,
         bestCoinrush,
@@ -73,24 +74,66 @@ export default async function handler(req: any, res: any) {
     } catch {
       body = {};
     }
+    // nickname: optional now — validated exactly as before when provided
+    const hasNickname = body.nickname !== undefined && body.nickname !== null;
     const nickname = String(body.nickname ?? "").trim();
-    if (!isValidNickname(nickname)) {
+    if (hasNickname && !isValidNickname(nickname)) {
       res.status(400).json({ error: "Nickname must be 3-16 letters, digits, underscores or spaces" });
       return;
     }
+
+    // avatar: undefined/null = leave unchanged, "" = clear, "data:image/..." = set
+    let avatarParam: string | null | undefined;
+    if (body.avatar !== undefined && body.avatar !== null) {
+      if (typeof body.avatar !== "string") {
+        res.status(400).json({ error: "avatar must be a string: a data:image/ URI or an empty string to clear" });
+        return;
+      }
+      if (body.avatar === "") {
+        avatarParam = null;
+      } else if (body.avatar.startsWith("data:image/") && body.avatar.length <= 400000) {
+        avatarParam = body.avatar;
+      } else {
+        res.status(400).json({ error: "avatar must be a data:image/ URI of at most 400000 characters, or an empty string to clear" });
+        return;
+      }
+    }
+
+    if (!hasNickname && avatarParam === undefined) {
+      res.status(400).json({ error: "Nothing to update: provide nickname and/or avatar" });
+      return;
+    }
+
     await ensureSchema();
     try {
-      const rows = await db()`
-        UPDATE players SET nickname = ${nickname}
-        WHERE id = ${id}
-        RETURNING id, nickname`;
+      let rows: any[];
+      if (hasNickname && avatarParam !== undefined) {
+        rows = await db()`
+          UPDATE players SET nickname = ${nickname}, avatar = ${avatarParam}
+          WHERE id = ${id}
+          RETURNING id, nickname, avatar`;
+      } else if (hasNickname) {
+        rows = await db()`
+          UPDATE players SET nickname = ${nickname}
+          WHERE id = ${id}
+          RETURNING id, nickname, avatar`;
+      } else {
+        rows = await db()`
+          UPDATE players SET avatar = ${avatarParam}
+          WHERE id = ${id}
+          RETURNING id, nickname, avatar`;
+      }
       if (rows.length === 0) {
         res.status(404).json({ error: "Player not found" });
         return;
       }
-      res.status(200).json({ id: String(rows[0].id), nickname: String(rows[0].nickname) });
+      res.status(200).json({
+        id: String(rows[0].id),
+        nickname: String(rows[0].nickname),
+        avatar: rows[0].avatar ? String(rows[0].avatar) : null,
+      });
     } catch (e) {
-      res.status(500).json({ error: e instanceof Error ? e.message : "Rename failed" });
+      res.status(500).json({ error: e instanceof Error ? e.message : "Update failed" });
     }
     return;
   }

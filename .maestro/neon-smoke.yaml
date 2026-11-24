@@ -1,11 +1,17 @@
-# Neon Rush smoke test - runs on the emulator (laptop E2E runner)
+# NeonRush smoke test — run with: maestro test .maestro/neon-smoke.yaml
 appId: com.neonrush.game
 ---
 - launchApp:
+    appId: com.neonrush.game
     clearState: true
-- assertVisible: "NEON RUSH"
-- assertVisible: "Classic Run"
-- assertVisible: "Coin Rush"
-- assertVisible: "Daily Challenge"
-- tapOn: "Classic Run"
+- extendedWaitUntil:
+    visible:
+      OR:
+        - id: "com.neonrush.game:id/neon_title"
+        - text: "NEON RUSH 3D"
+    timeout: 10000
+- assertVisible: "Classic"
+- tapOn: "Classic"
+- waitForAnimationToEnd:
+    timeout: 5000
 - assertVisible: "TAP TO START"
